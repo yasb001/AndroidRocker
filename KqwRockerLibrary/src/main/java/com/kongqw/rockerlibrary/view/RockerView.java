@@ -3,6 +3,7 @@ package com.kongqw.rockerlibrary.view;
 import android.content.Context;
 import android.content.res.TypedArray;
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
@@ -13,6 +14,8 @@ import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.ColorDrawable;
 import android.graphics.drawable.Drawable;
 import android.graphics.drawable.GradientDrawable;
+import android.graphics.drawable.VectorDrawable;
+import android.os.Build;
 import android.util.AttributeSet;
 import android.view.MotionEvent;
 import android.view.View;
@@ -142,7 +145,11 @@ public class RockerView extends View {
                 // 色值
                 mAreaColor = ((ColorDrawable) areaBackground).getColor();
                 mAreaBackgroundMode = AREA_BACKGROUND_MODE_COLOR;
-            } else {
+            } else if (areaBackground instanceof VectorDrawable) {
+                // Vector
+                mAreaBitmap = vector2Bitmap(areaBackground);
+                mAreaBackgroundMode = AREA_BACKGROUND_MODE_XML;
+            }else {
                 // 其他形式
                 mAreaBackgroundMode = AREA_BACKGROUND_MODE_DEFAULT;
             }
@@ -166,7 +173,12 @@ public class RockerView extends View {
                 // 色值
                 mRockerColor = ((ColorDrawable) rockerBackground).getColor();
                 mRockerBackgroundMode = ROCKER_BACKGROUND_MODE_COLOR;
-            } else {
+            }else if (rockerBackground instanceof VectorDrawable) {
+                // 色值
+                mRockerBitmap = vector2Bitmap(rockerBackground);
+                mRockerBackgroundMode = ROCKER_BACKGROUND_MODE_XML;
+            }
+            else {
                 // 其他形式
                 mRockerBackgroundMode = ROCKER_BACKGROUND_MODE_DEFAULT;
             }
@@ -365,6 +377,23 @@ public class RockerView extends View {
         drawable.draw(canvas);
         return bitmap;
     }
+
+	/**
+     * vector 转 Bitmap
+     *
+     * @param drawable Drawable
+     * @return Bitmap
+     */
+    private Bitmap vector2Bitmap(Drawable drawable){
+        Bitmap bitmap = Bitmap.createBitmap(drawable.getIntrinsicWidth(),
+                drawable.getIntrinsicHeight(), Bitmap.Config.ARGB_8888);
+        Canvas canvas = new Canvas(bitmap);
+        drawable.setBounds(0, 0, canvas.getWidth(), canvas.getHeight());
+        drawable.draw(canvas);
+        return bitmap;
+
+    }
+
 
     /**
      * 回调
